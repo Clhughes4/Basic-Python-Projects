@@ -40,51 +40,39 @@ class ParentWindow(Frame):
         self.master.destroy()
 
     def source_dir(self):
-        fileName = filedialog.askdirectory()
+        self.fileName1 = filedialog.askdirectory()
         self.txtEntry.delete(0,END)
-        self.txtEntry.insert(0,fileName)
-
+        self.txtEntry.insert(0,self.fileName1)
+        
+        
     def dest_dir(self):
-        fileName = filedialog.askdirectory()
+        self.fileName2 = filedialog.askdirectory()
         self.txtEntry2.delete(0,END)
-        self.txtEntry2.insert(0,fileName)
-
+        self.txtEntry2.insert(0,self.fileName2)
+        
+        
     def find_file(self):
         dirName = self.txtEntry.get()
-        print(dirName)
         self.create_db()
-
+        source = dirName
+        dest = self.fileName2
+        
         dirList = os.listdir(dirName)
-        # print the list
         conn = sqlite3.connect('DATA.db')
         with conn:
             cur = conn.cursor()
             for file in dirList:
                 if file.endswith('.txt'):
-                    print(file)
                     modTime = os.path.getmtime(os.path.join(dirName,file))
-                    # print the last modification time
-                    print(modTime)
-
                     realTime = time.ctime(modTime)
-                    print(realTime,'\n')
+                    print(file, realTime)
                     cur.execute('INSERT INTO tbl_DataFile(File_Name, Modified_Date) VALUES (?, ?)', \
                                 (file, realTime))
+                    shutil.move(os.path.join(dirName,file), dest)
             conn.commit()
+            
         conn.close()
-        self.new_dir()
-
-
-
-    def new_dir(self):
-        src = source_dir
-        dst = dest_dir
-        print(dst)
-        for files in src:
-            if files.endswith('.txt'):
-                shutil.move(files,dst)
-        
-        
+    
         
 
     def create_db(self):
@@ -101,13 +89,6 @@ class ParentWindow(Frame):
         
 
 
-
-    
-
-    
-    
-
-    
 
 
         
